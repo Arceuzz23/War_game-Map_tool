@@ -162,7 +162,13 @@ class _homepageState extends State<homepage> {
                               width: MediaQuery.of(context).size.width/1.5,
                               height: MediaQuery.of(context).size.height/1.2,
                               color: Colors.orange,
-                              child: Image.asset('$valueChoose',fit: BoxFit.fill,
+                              child: GridPaper(
+                                interval: 45,
+                                divisions: 2,
+                                subdivisions: 1,
+                                color: Colors.black45,
+                                child: Image.asset('$valueChoose',fit: BoxFit.fill,
+                                ),
                               ),
                             ),
                             Container(
