@@ -3,6 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:war_game_map_tool/screens/home_page.dart';
+import 'package:war_game_map_tool/screens/table.dart';
 
 void main() {
   runApp(const MyApp());

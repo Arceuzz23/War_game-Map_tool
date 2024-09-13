@@ -1,8 +1,10 @@
 import 'dart:ui';
 
+import 'package:csv/csv.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class homepage extends StatefulWidget {
@@ -13,6 +15,51 @@ class homepage extends StatefulWidget {
 }
 
 class _homepageState extends State<homepage> {
+
+  List<List<dynamic>> data = [];
+
+  List<List<dynamic>> convertTo6x10(List<List<dynamic>> input) {
+    // Flatten the list if necessary (in this case, input[0] is already a flat list)
+    List<dynamic> flatList = input.expand((i) => i).toList();
+
+    // Define the number of columns
+    int columns = 6;
+
+    // Convert the flat list into a 2D list with 6 columns
+    List<List<dynamic>> output = [];
+    for (int i = 0; i < flatList.length; i += columns) {
+      // Ensure we don't go out of bounds with the sublist
+      output.add(flatList.sublist(i, (i + columns > flatList.length) ? flatList.length : i + columns));
+    }
+
+    return output;
+  }
+
+
+  List<List<dynamic>> removeLastColumn(List<List<dynamic>> twoDList) {
+    // Iterate through each row and remove the last element if the row is not empty
+    for (var row in twoDList) {
+      if (row.isNotEmpty) {
+        row.removeLast();
+      }
+    }
+    return twoDList;
+  }
+  List<List<dynamic>> input = [
+    [
+      'ID', 'Description', 'Faction', 'X', 'Y', 'Group',
+      1, '1x DDG; 1x FFG; 1x Corvette; 1x Minesweeper; 2x Helicopter', 'RED', 5, 12, 'Surface',
+      2, 'Maritime Militia Vessel', 'RED', 4, 7, 'Surface',
+      3, 'Maritime Militia Vessel', 'RED', 2, 6, 'Surface',
+      4, 'Maritime Militia Vessel', 'RED', 2, 5, 'Surface',
+      5, 'Maritime Militia Vessel', 'RED', 3, 3, 'Surface',
+      6, 'Merchant vessel', 'PURPLE', 4, 1, 'Surface',
+      7, 'Merchant vessel', 'PURPLE', 6, 3, 'Surface',
+      8, 'Merchant vessel', 'PURPLE', 9, 5, 'Surface',
+      9, 'Merchant vessel', 'PURPLE', 5, 8, 'Surface',
+    ]
+  ];
+
 
   String map="M A P";
   String player="player";
@@ -33,26 +80,42 @@ class _homepageState extends State<homepage> {
   void initState() {
     super.initState();
     valueChoose = map_asset[0];
+    _loadCSV();
+    List<List<dynamic>> output = convertTo6x10(input);
+    print(output);
+    output = removeLastColumn(output);
+    data= output;
+    print(data);
+  }
+
+  void _loadCSV() async {
+    final rawData = await rootBundle.loadString('assets/Master Files/Hokkaido Tactical Map - 1-master.csv');
+    // Parse CSV string to 2D list
+    List<List<dynamic>> input = CsvToListConverter().convert(rawData);
+
+
   }
 
   String valueChoose ="";
   @override
   Widget build(BuildContext context) {
+    final headers = data.isNotEmpty ? data[0] : [];
     return Scaffold(
         body:  Center(
           child: Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width/3,
+                      width: MediaQuery.of(context).size.width/2.4,
                       height: MediaQuery.of(context).size.height,
                       color: Colors.grey[400],
                       child: Column(
                           children: [
                             Container(
-                                height: MediaQuery.of(context).size.height/2,
+                                height: MediaQuery.of(context).size.height/2.5,
                                 width: MediaQuery.of(context).size.width/2,
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -64,7 +127,7 @@ class _homepageState extends State<homepage> {
                                           AutoSizeText('Selected Map :',style: GoogleFonts.robotoSlab(fontSize: 20,),),
                                           SizedBox(width: 10,),
                                           DropdownButton(
-                                               value: valueChoose,
+                                              value: valueChoose,
                                               items: map_asset.map((value_items) {
                                                 return DropdownMenuItem(
                                                   value: value_items,
@@ -143,17 +206,43 @@ class _homepageState extends State<homepage> {
                                 )
                             ),
                             Container(
-                              height: MediaQuery.of(context).size.height/2,
-                              width: MediaQuery.of(context).size.width/2,
-                              color: Colors.grey[400],
-                              child: Center(
-                                child: Text("ref table",style: TextStyle(fontSize: 20,),),
-                              ),
-                            ),
+                                height: MediaQuery.of(context).size.height/2,
+                                width: MediaQuery.of(context).size.width/2.2,
+                                color: Colors.grey[400],
+                                child: Center(
+                                  child:SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: DataTable(
+                                      border: TableBorder.all(
+                                        color: Colors.black,
+                                      ),
+                                      horizontalMargin: 10,
+                                     dividerThickness: 1,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.black),
+                                      ),
+                                      dataRowHeight: 25,
+                                      columnSpacing: 25,
+                                      columns: headers.map((header) => DataColumn(
+                                        label: Text(header.toString()),
+                                      )).toList(),
+                                      rows: data.sublist(1).map((row) {
+                                        return DataRow(
+                                          cells: row.map((cell) => DataCell(
+                                            Text(cell.toString()),
+                                          )).toList(),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                )),
+
                           ]),
                     ),
+
+
                     Container(
-                      width: MediaQuery.of(context).size.width/1.5,
+                      width: MediaQuery.of(context).size.width/1.72,
                       height: MediaQuery.of(context).size.height,
                       color: Colors.red,
                       child: Column(

@@ -1,0 +1,10 @@
+ID,Description,Faction,X,Y,Group
+1,1x DDG; 1x FFG; 1x Corvette; 1x Minesweeper; 2x Helicopter,RED,2,12,Surface
+2,3x MM Vessels,RED,4,11,Surface
+3,2x MM Vessels,RED,5,11,Surface
+4,1x SS,RED,2,8,Undersea
+5,1x SS,RED,5,9,Undersea
+6,1x SS,RED,10,12,Undersea
+7,DDG-51,PURPLE,13,1,Surface
+8,LNG Tanker,PURPLE,13,1,Surface
+9,LNG Tanker,BLUE,10,1,Surface
